@@ -1,18 +1,10 @@
 <template>
+
   <div id="app">
-    <header class="header">
-      <div class="navbar-brand">
-        <img alt="Vue logo" src="./assets/logo.png">
-      </div>
+    <head>
+  <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
 
-      <div class="navbar-brand-name">
-        <h1 class="title">Vue Record</h1>
-        <h2 class="subtitle">
-          components for MediaRecorder API
-        </h2>
-      </div>
-    </header>
-
+</head>
     <main class="container has-text-centered">
       <section id="example-audio">
         <div class="columns">
@@ -24,15 +16,6 @@
 
             <div class="record-settings">
               <vue-record-audio :mode="recordMode.audio" @stream="onStream" @result="onResult" />
-              <div class="field">
-                <label class="label">Mode</label>
-                <div class="select">
-                  <select v-model="recordMode.audio">
-                    <option value="press">Press</option>
-                    <option value="hold">Hold</option>
-                  </select>
-                </div>
-              </div>
             </div>
           </div>
           <div class="column">
@@ -56,47 +39,43 @@
 
             <div class="record-settings">
               <vue-record-video mode="press" @stream="onVideoStream" @result="onVideoResult" />
-              <div class="field">
-                <label class="label">Mode</label>
-                <div class="select">
-                  <select v-model="recordMode.video">
-                    <option value="press">Press</option>
-                    <option value="hold">Hold</option>
-                  </select>
-                </div>
-              </div>
             </div>
           </div>
           <div class="column">
-            <div class="recorded-video">
-              <video ref="Video" width="400" height="250" controls></video>
+            <div class="recorded-video" v-if="videoRef">
+              <videoCut :video_options="video_options" :video_offset_ms="video_offset_ms"  />
             </div>
           </div>
         </div>
       </section>
     </main>
 
-    <footer class="footer">
-      <div class="content has-text-centered">
-        <p>
-          The source code is licensed <a href="https://github.com/codekraft-studio/vue-record/blob/master/LICENSE">MIT</a>.
-          Made with ♥ by <a href="https://github.com/codekraft-studio">Codekraft Studio</a>.
-        </p>
-      </div>
-    </footer>
   </div>
 </template>
 
 <script>
+import Vue from 'vue'
+import videoCut from 'vue-video-cut'
+
+Vue.use(videoCut)
 export default {
   name: 'app',
   data () {
     return {
+      videoRef: null,
       recordMode: {
-        audio: 'hold',
+        audio: 'press',
         video: 'press'
       },
-      recordings: []
+      recordings: [],
+      video_options: {
+        width: 600,
+        height: 250,
+      },
+      video_offset_ms: {
+        start_ms: 0,
+        end_ms: 6000,
+      },
     }
   },
   methods: {
@@ -110,14 +89,16 @@ export default {
       console.log('Got a video stream object:', stream);
     },
     onVideoResult (data) {
-      this.$refs.Video.srcObject = null
-      this.$refs.Video.src = window.URL.createObjectURL(data)
+      this.video_options.src = null;
+      this.videoRef =  window.URL.createObjectURL(data);
+      this.video_options.src = this.videoRef;
+      console.log(this.videoRef)      
     },
     onResult (data) {
       this.recordings.push({
         src: window.URL.createObjectURL(data)
       })
-    }
+    },
   }
 }
 </script>

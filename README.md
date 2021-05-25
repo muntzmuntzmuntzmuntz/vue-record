@@ -1,3 +1,6 @@
+# Changes
+Add ability to specify custom start and end time for videos.
+
 # vue-record
 
 > custom components for MediaRecorder API
